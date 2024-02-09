@@ -1,7 +1,4 @@
-// This is actually the only Polyfill we need for iOS Safari on the Worker thread, neat.
-// (core-js isn't bundled with the main thread, since the consumer can do that, but
-// with the Worker thread being compiled into a string, this needs to be done upfront).
-import "core-js/modules/es.promise.with-resolvers";
+//import "core-js";
 
 import { expose } from "comlink";
 import * as Encoder from "./encoder.js";

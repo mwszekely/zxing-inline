@@ -1,4 +1,5 @@
-export { QrAnimatingScanner } from "./qr-animator.js";
-export { QrEncoder } from "./qr-encoder.js";
-export { QrScanner } from "./qr-scanner.js";
-//# sourceMappingURL=../../src/dist/thread-main/index.d.ts.map
+export { BarcodeAnimatingScanner, type AnimatedScanResult, type BarcodeAnimatingScannerConstructorOptions, type RenderInfo } from "./animating-scanner.js";
+export { BarcodeEncoder, BarcodeEncoderBase, EmptyInputError, type BarcodeEncoderOptions } from "./encoder.js";
+export { QrEncoder, type QrEncodeOptions, type QrErrorCorrectionLevel } from "./qr-encoder.js";
+export { BarcodeScanner, type BarcodeScannerConstructorOptions } from "./scanner.js";
+//# sourceMappingURL=index.d.ts.map

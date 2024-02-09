@@ -1,6 +1,6 @@
+import { ReadableBarcodeFormats } from "../thread-worker/barcode-formats.js";
 import type { ScanResult } from "../thread-worker/shared.js";
-import { CameraStreamerConstructorOptions } from "./camera-streamer.js";
-import { QrScanner } from "./qr-scanner.js";
+import { BarcodeScanner, BarcodeScannerConstructorOptions } from "./scanner.js";
 
 
 export interface RenderInfo extends ScanResult {
@@ -112,11 +112,6 @@ export function defaultRender({ context, color: opacity2, opacity, positions, or
 
 }
 
-export type QrAnimatingScannerOptions = CameraStreamerConstructorOptions & {
-    canvas: HTMLCanvasElement;
-    render?: (info: RenderInfo) => void;
-}
-
 
 export interface AnimatedScanResult extends ScanResult {
     firstScanned: number;
@@ -125,20 +120,42 @@ export interface AnimatedScanResult extends ScanResult {
     freshness: Freshness;
 }
 
+export interface BarcodeAnimatingScannerConstructorOptions extends BarcodeScannerConstructorOptions {
+    /**
+     * The canvas that will be drawn to. Should be overlaid over the
+     * video that the camera is streaming to.
+     */
+    canvas: HTMLCanvasElement;
+
+    /**
+     * In milliseconds, how long it takes to "forget" a QR code
+     * and allow it to be scanned again (default: 3000).
+     * 
+     * This can be set to `Infinity`, but might be frustrating for
+     * users in the uncommon case where this is desirable behavior.
+     */
+    rescanTimeout?: number;
+
+    /**
+     * If provided, this function will be used to draw to the canvas instead of our own.
+     */
+    render?: (info: RenderInfo) => void;
+}
+
 /**
  * Derivation of QrScanner that tracks a single code over time so it can be drawn with an information overlay, or other operations.
  * 
  * Every frame, your `render` function will be called with any recently-scanned QR codes, along with some information about how
  * recently they've been scanned. `defaultRender` provides a sensible default for a `render` function.
  */
-export class QrAnimatingScanner extends QrScanner {
+export class BarcodeAnimatingScanner extends BarcodeScanner {
     private _context: CanvasRenderingContext2D;
     private _render: (info: RenderInfo) => void;
     private _canvasElement: HTMLCanvasElement;
     private _rafHandle = 0;
     private _currentScanResults = new Map<number, AnimatedScanResult>();
 
-    constructor({ canvas, render, ...opts }: QrAnimatingScannerOptions) {
+    constructor({ canvas, render, ...opts }: Omit<BarcodeAnimatingScannerConstructorOptions, "constraints">) {
         super(opts);
         this._canvasElement = canvas;
         this._context = this._canvasElement.getContext('2d')!;
@@ -155,8 +172,8 @@ export class QrAnimatingScanner extends QrScanner {
      * 
      * If any are found, the canvas will animate to reflect the status of their scan.
      */
-    override async scanOnce() {
-        const results = await super.scanOnce();
+    override async scanOnce(format: ReadableBarcodeFormats = "QRCode") {
+        const results = await super.scanOnce(format);
         if (results.length == 0) {
             this.onScan(null);
             return [];
@@ -190,7 +207,7 @@ export class QrAnimatingScanner extends QrScanner {
                 this.onScan(ret);
 
                 return ret;
-            })
+            }).filter(a => a.freshness == 'new');
     }
 
 
@@ -218,6 +235,12 @@ export class QrAnimatingScanner extends QrScanner {
         return isNewQrCode;
     }
 
+    private _rescanTimeout: number = 3;
+
+    get rescanTimeout() { return this._rescanTimeout }
+    set rescanTimeout(milliseconds: number) { this._rescanTimeout = milliseconds / 1000; }
+
+
     private onAnimationFrame() {
         this._context.clearRect(0, 0, this._canvasElement.width, this._canvasElement.height);
         this._context.lineWidth = 4;
@@ -225,7 +248,7 @@ export class QrAnimatingScanner extends QrScanner {
         let hashesToDelete = new Set<number>();
 
         const FADE_DURATION_OPACITY = 1.5;
-        const FADE_DURATION_COLOR = 3;
+        const FADE_DURATION_COLOR = this._rescanTimeout;
 
 
         for (const [hash, currentResult] of this._currentScanResults) {

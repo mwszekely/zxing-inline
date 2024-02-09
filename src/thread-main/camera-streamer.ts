@@ -12,9 +12,9 @@ export interface CameraStreamerConstructorOptions {
     video?: HTMLVideoElement | null | undefined;
 }
 
-const anyUserInput = Promise.withResolvers<void>();
-const auiHandler = () => { anyUserInput.resolve(); document.removeEventListener("click", auiHandler, { capture: true }) };
-document.addEventListener("click", auiHandler, { capture: true, passive: true });
+//const anyUserInput = Promise.withResolvers<void>();
+//const auiHandler = () => { anyUserInput.resolve(); document.removeEventListener("click", auiHandler, { capture: true }) };
+//document.addEventListener("click", auiHandler, { capture: true, passive: true });
 
 /**
  * Helper class that allows capturing a frame of the camera.
@@ -131,7 +131,7 @@ export class CameraStreamer {
 
     async changeMedia(constraints: MediaStreamConstraints) {
         this._dataLoaded = Promise.withResolvers();
-        await anyUserInput.promise;
+        //await anyUserInput.promise;
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         this._videoElement.srcObject = stream;
         await this._dataLoaded.promise;

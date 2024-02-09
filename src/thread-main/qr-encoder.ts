@@ -1,15 +1,24 @@
 
-import { encode, scanAll, waitUntilReady } from "./thread-interop.js";
+import { BarcodeEncoderBase, BarcodeEncoderOptions } from "./encoder.js";
+import { scanAll, waitUntilReady } from "./thread-interop.js";
 
-export interface QrEncoderOptions {
-    document?: Document;
+
+export type QrErrorCorrectionLevel = '1L' | '2M' | '3Q' | '4H';
+
+const ECCMap: Record<QrErrorCorrectionLevel, number> = {
+    "1L": 1,
+    "2M": 3,
+    "3Q": 5,
+    "4H": 7
 }
 
-export interface EncodeOptions {
+type ArrayOrT<T> = T | T[];
+
+export interface QrEncodeOptions {
     /**
-     * Defaults to 4 if unspecified, or 8 if a cutout is requested.
+     * From least to most robust: L, M, Q, H.
      */
-    errorCorrection?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+    errorCorrection?: QrErrorCorrectionLevel;
 
     /**
      * This will be drawn over the QR code in the center. If the resulting image is not scannable, no image will be drawn.
@@ -21,33 +30,27 @@ export interface EncodeOptions {
     cutoutImages?: ArrayOrT<Exclude<CanvasImageSource, HTMLOrSVGImageElement | VideoFrame>>;
 }
 
-type ArrayOrT<T> = T | T[];
+/**
+ * Encodes data into a QR code.
+ */
+export class QrEncoder extends BarcodeEncoderBase<CanvasRenderingContext2D> {
 
-const t = new TextEncoder();
-export class QrEncoder {
-    _canvas: HTMLCanvasElement;
-    _context: CanvasRenderingContext2D;
-
-    constructor({ document }: QrEncoderOptions = {}) {
-        document ??= window.document;
-        this._canvas = document.createElement("canvas");
-        this._canvas.style.display = 'none';
-        document.body.appendChild(this._canvas);
-        this._context = this._canvas.getContext('2d', { willReadFrequently: true })!;
+    constructor({document}: BarcodeEncoderOptions = { document: window.document }) {
+        super({ document, id: "2d" })
     }
 
-    async encode(inputData: Int8Array, options?: EncodeOptions): Promise<Blob>;
-    async encode(inputData: Uint8Array, options?: EncodeOptions): Promise<Blob>;
-    async encode(inputData: Uint8ClampedArray, options?: EncodeOptions): Promise<Blob>;
-    async encode(inputData: string, options?: EncodeOptions): Promise<Blob>;
-    async encode(inputData: Int8Array | Uint8Array | Uint8ClampedArray | string, { errorCorrection, cutoutImages }: EncodeOptions = {}): Promise<Blob> {
+    async encode(inputData: Int8Array, options?: QrEncodeOptions): Promise<Blob>;
+    async encode(inputData: Uint8Array, options?: QrEncodeOptions): Promise<Blob>;
+    async encode(inputData: Uint8ClampedArray, options?: QrEncodeOptions): Promise<Blob>;
+    async encode(inputData: string, options?: QrEncodeOptions): Promise<Blob>;
+    async encode(inputData: Int8Array | Uint8Array | Uint8ClampedArray | string, { errorCorrection, cutoutImages }: QrEncodeOptions = {}): Promise<Blob> {
         await waitUntilReady();
 
-        errorCorrection ||= (cutoutImages ? 8 : 4);
+        errorCorrection ||= '2M';
+        const eccNumeric = (ECCMap[errorCorrection] || ECCMap["2M"]);
+        const bmp = await this.encodeBasic(inputData, "QRCode", eccNumeric);
+        const { width, height } = bmp;
 
-        const parsedData = new Uint8ClampedArray(typeof inputData == 'string' ? t.encode(inputData) : inputData);
-        let { data, width, height } = await encode(parsedData, typeof inputData == 'string' ? 'utf8' : 'binary', errorCorrection);
-        const bmp = await createImageBitmap(new ImageData(new Uint8ClampedArray(data!), width, height), {});
         this._canvas.width = width;
         this._canvas.height = height;
         this._context = this._canvas.getContext('2d', { willReadFrequently: true })!;
@@ -89,3 +92,5 @@ export class QrEncoder {
         this._canvas.remove();
     }
 }
+
+

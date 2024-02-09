@@ -26,4 +26,4 @@ declare function getWasmAsync(): Promise<WebAssembly.WebAssemblyInstantiatedSour
  */
 declare function provideSource(source: SourceTypes): void;
 export { getWasmAsync, getWasmSync, provideSource };
-//# sourceMappingURL=../../src/dist/thread-worker/instance.d.ts.map
+//# sourceMappingURL=instance.d.ts.map

@@ -1,1 +1,1 @@
-{"version":3,"file":"thread-interop.d.ts","sourceRoot":"./","sources":["thread-main/thread-interop.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,KAAK,aAAa,MAAM,2BAA2B,CAAC;AAShE,QAAA,MAAQ,OAAO,0DAAiB,cAAc,iEAAE,MAAM,uDAAmD,CAAC;AAG1G,OAAO,EAAE,MAAM,EAAE,OAAO,EAAE,cAAc,EAAE,CAAC"}
+{"version":3,"file":"thread-interop.d.ts","sourceRoot":"./","sources":["thread-main/thread-interop.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,KAAK,aAAa,MAAM,2BAA2B,CAAC;AAUhE,QAAA,MAAQ,OAAO,0DAAiB,cAAc,iEAAE,MAAM,uDAAmD,CAAC;AAG1G,OAAO,EAAE,MAAM,EAAE,OAAO,EAAE,cAAc,EAAE,CAAC"}

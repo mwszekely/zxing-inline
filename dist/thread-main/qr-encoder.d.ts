@@ -1,11 +1,11 @@
-export interface QrEncoderOptions {
-    document?: Document;
-}
-export interface EncodeOptions {
+import { BarcodeEncoderBase, BarcodeEncoderOptions } from "./encoder.js";
+export type QrErrorCorrectionLevel = '1L' | '2M' | '3Q' | '4H';
+type ArrayOrT<T> = T | T[];
+export interface QrEncodeOptions {
     /**
-     * Defaults to 4 if unspecified, or 8 if a cutout is requested.
+     * From least to most robust: L, M, Q, H.
      */
-    errorCorrection?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+    errorCorrection?: QrErrorCorrectionLevel;
     /**
      * This will be drawn over the QR code in the center. If the resulting image is not scannable, no image will be drawn.
      *
@@ -15,16 +15,16 @@ export interface EncodeOptions {
      */
     cutoutImages?: ArrayOrT<Exclude<CanvasImageSource, HTMLOrSVGImageElement | VideoFrame>>;
 }
-type ArrayOrT<T> = T | T[];
-export declare class QrEncoder {
-    _canvas: HTMLCanvasElement;
-    _context: CanvasRenderingContext2D;
-    constructor({ document }?: QrEncoderOptions);
-    encode(inputData: Int8Array, options?: EncodeOptions): Promise<Blob>;
-    encode(inputData: Uint8Array, options?: EncodeOptions): Promise<Blob>;
-    encode(inputData: Uint8ClampedArray, options?: EncodeOptions): Promise<Blob>;
-    encode(inputData: string, options?: EncodeOptions): Promise<Blob>;
+/**
+ * Encodes data into a QR code.
+ */
+export declare class QrEncoder extends BarcodeEncoderBase<CanvasRenderingContext2D> {
+    constructor({ document }?: BarcodeEncoderOptions);
+    encode(inputData: Int8Array, options?: QrEncodeOptions): Promise<Blob>;
+    encode(inputData: Uint8Array, options?: QrEncodeOptions): Promise<Blob>;
+    encode(inputData: Uint8ClampedArray, options?: QrEncodeOptions): Promise<Blob>;
+    encode(inputData: string, options?: QrEncodeOptions): Promise<Blob>;
     [Symbol.dispose](): void;
 }
 export {};
-//# sourceMappingURL=../../src/dist/thread-main/qr-encoder.d.ts.map
+//# sourceMappingURL=qr-encoder.d.ts.map

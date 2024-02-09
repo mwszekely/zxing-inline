@@ -1,15 +1,13 @@
-import resolve from "@rollup/plugin-node-resolve";
-import chunkWorkers from "rollup-plugin-chunk-workers";
 
-/**
- * This is the file that inlines the Worker into the main file.
- */
+import { babel } from "@rollup/plugin-babel";
+import cjs from "@rollup/plugin-commonjs";
+import resolve from "@rollup/plugin-node-resolve";
 
 /** @type {import('rollup').RollupOptions} */
 export default {
-    input: "dist/index-separated.js",
+    input: "demo/index.js",
     output: {
-        file: "dist/index.js",
+        file: "demo/bundle.js",
         format: "es",
         sourcemap: true,
         paths: {
@@ -19,7 +17,8 @@ export default {
     external: ['https://unpkg.com/comlink/dist/esm/comlink.mjs'],
     treeshake: "recommended",
     plugins: [
-        chunkWorkers({ mode: "inline" }),
+        babel({ babelHelpers: 'bundled' }),
         resolve(),
-    ],
+        cjs()
+    ]
 }

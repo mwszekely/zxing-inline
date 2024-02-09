@@ -44,4 +44,4 @@ export declare class CameraStreamer {
     getLastCapture(): ImageData | null;
     [Symbol.dispose](): void;
 }
-//# sourceMappingURL=../../src/dist/thread-main/camera-streamer.d.ts.map
+//# sourceMappingURL=camera-streamer.d.ts.map

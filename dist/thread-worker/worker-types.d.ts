@@ -76,4 +76,4 @@ declare module 'basic-event-wasi' {
     }
 }
 export {};
-//# sourceMappingURL=../../src/dist/thread-worker/worker-types.d.ts.map
+//# sourceMappingURL=worker-types.d.ts.map

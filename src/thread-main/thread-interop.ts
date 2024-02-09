@@ -8,7 +8,8 @@ import zxingBinary from "../wasm/qr.wasm";
 // This file retrivies the WASM binary and sends it to the worker thread.
 // It also wraps the Worker itself via Comlink.
 // TODO: Is it better for the Worker itself to have the WASM source directly?
-const rawWorker = new Worker(new URL("../thread-worker/index.js", import.meta.url), { type: "module" });
+//const rawWorker = new Worker(new URL("../thread-worker/index.js", import.meta.url), { type: "module" });
+const rawWorker = new Worker(new URL("./qr-thread.js", import.meta.url), { type: "module" });
 const { scanAll, provideSource, waitUntilReady, encode, ...rest } = wrap<typeof WorkerExports>(rawWorker);
 provideSource(zxingBinary);
 

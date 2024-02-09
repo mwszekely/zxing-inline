@@ -1,8 +1,7 @@
 import { ReadableBarcodeFormats } from "../thread-worker/barcode-formats.js";
 import type { ScanResult } from "../thread-worker/shared.js";
 import { CameraStreamer, CameraStreamerConstructorOptions } from "./camera-streamer.js";
-export interface QrScannerConstructorOptions extends CameraStreamerConstructorOptions {
-    constraints?: MediaStreamConstraints;
+export interface BarcodeScannerConstructorOptions extends CameraStreamerConstructorOptions {
 }
 /**
  * Create a `QrScanner` with a pre-existing <video> and <canvas> element
@@ -16,11 +15,10 @@ export interface QrScannerConstructorOptions extends CameraStreamerConstructorOp
  */
 export declare class BarcodeScanner implements Pick<CameraStreamer, "changeMedia" | "getLastCapture"> {
     private _streamer;
-    static create({ constraints, ...opts }?: QrScannerConstructorOptions): Promise<BarcodeScanner>;
-    protected constructor(opts?: CameraStreamerConstructorOptions);
+    constructor(opts?: Omit<BarcodeScannerConstructorOptions, "constraints">);
     changeMedia(constraints?: MediaStreamConstraints): Promise<void>;
     getLastCapture(): ImageData | null;
     scanOnce(format?: ReadableBarcodeFormats): Promise<ScanResult[]>;
     [Symbol.dispose](): void;
 }
-//# sourceMappingURL=qr-scanner.d.ts.map
+//# sourceMappingURL=scanner.d.ts.map

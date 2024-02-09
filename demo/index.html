@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        .controls {
+            padding: 0.5em;
+            border: 1px solid black;
+            background: #ddd;
+        }
+
+        #qr-output {
+            width: 100%;
+            max-height: 50vh;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        .video-container {
+            display: grid;
+            width: 640px;
+            height: 480px;
+        }
+        .video-container>* {
+            grid-column: 1 / span 1;
+            grid-row: 1 / span 1;
+        }
+
+        .output {
+
+        }
+    </style>
+    <script src="./bundle.js" async type="module"></script>
+</head>
+
+<body>
+    <div class="controls">
+        <label>Input text: <input type="text" id="qr-input-text" value="QR code example text"></label>
+        <label>Error correction level: <select id="qr-input-ecc">
+                <option value="1L">1L (least robust)</option>
+                <option value="2M" selected>2M</option>
+                <option value="3Q">3Q</option>
+                <option value="4H">4H (most robust)</option>
+            </select>
+        </label>
+        <label>Format:
+            <select id="qr-input-format">
+                <option value="Aztec">Aztec</option>
+                <option value="Codabar">Codabar</option>
+                <option value="Code128">Code128</option>
+                <option value="Code39">Code39</option>
+                <option value="Code93">Code93</option>
+                <option value="DataMatrix">DataMatrix</option>
+                <option value="EAN13">EAN13</option>
+                <option value="EAN8">EAN8</option>
+                <option value="ITF">ITF</option>
+                <option value="PDF417">PDF417</option>
+                <option value="QRCode" selected>QRCode</option>
+                <option value="UPCA">UPCA</option>
+                <option value="UPCE">UPCE</option>
+                <option value="DataBar" disabled>DataBar</option>
+                <option value="DataBarExpanded" disabled>DataBarExpanded</option>
+                <option value="DXFilmEdge" disabled>DXFilmEdge</option>
+                <option value="MaxiCode" disabled>MaxiCode</option>
+                <option value="MicroQRCode" disabled>MicroQRCode</option>
+                <option value="RMQRCode" disabled>RMQRCode</option>
+            </select>
+        </label>
+    </div>
+    <div class="video-container">
+        <video id="camera"></video>
+        <canvas id="animator"></canvas>
+    </div>
+    <textarea id="output-text"></textarea>
+    <div class="output">
+        <img id="qr-output">
+    </div>
+</body>
+
+</html>

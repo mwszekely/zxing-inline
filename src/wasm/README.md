@@ -6,14 +6,13 @@ It may be useful to have multiple Workers instantiated from the same source, for
 
 ## To Build
 
-Run the following command (for line continuations you may need to replace the Powershell backticks for more sensible backslashes). 
+Run the following command (given in Powershell, replace the backticks as appropriate for more sensible shells). 
 
 These assumptions are made:
 
 1. You're compiling from the project root, not here (i.e. `cd ../..` if necessary)
 1. Emscripten is on your PATH. If it's not, you can quickly do this by going to your `emsdk` directory, opening a new terminal, and running `emsdk_env`, then coming back to the root project directory and running this command.
-1. `emsdk`, with its `#include`-able header files, can be found in the parent folder (second line, `-I"../emsdk/upstream/<...>`). Adjust if not.
-1. This would be better as, like, a Makefile or something (but it's not).
+1. `emsdk`, with its `#include`-able header files, can be found in the parent folder (on second line, `-I"../emsdk/upstream/<...>`). Adjust if not.
 
 ```powershell
 em++ `
@@ -60,6 +59,7 @@ em++ `
 ./src/wasm/zxing-cpp/core/src/Utf.cpp `
 ./src/wasm/zxing-cpp/core/src/WhiteRectDetector.cpp `
 ./src/wasm/zxing-cpp/core/src/ZXBigInteger.cpp `
+./src/wasm/zxing-cpp/core/src/zxing-c.cpp `
 ./src/wasm/zxing-cpp/core/src/aztec/AZDecoder.cpp `
 ./src/wasm/zxing-cpp/core/src/aztec/AZDetector.cpp `
 ./src/wasm/zxing-cpp/core/src/aztec/AZEncoder.cpp `
@@ -100,7 +100,6 @@ em++ `
 ./src/wasm/zxing-cpp/core/src/oned/ODITFWriter.cpp `
 ./src/wasm/zxing-cpp/core/src/oned/ODMultiUPCEANReader.cpp `
 ./src/wasm/zxing-cpp/core/src/oned/ODReader.cpp `
-./src/wasm/zxing-cpp/core/src/oned/ODRowReader.cpp `
 ./src/wasm/zxing-cpp/core/src/oned/ODUPCAWriter.cpp `
 ./src/wasm/zxing-cpp/core/src/oned/ODUPCEANCommon.cpp `
 ./src/wasm/zxing-cpp/core/src/oned/ODUPCEWriter.cpp `
@@ -134,3 +133,24 @@ em++ `
 ./src/wasm/zxing-cpp/core/src/qrcode/QRWriter.cpp `
 ./src/wasm/zxing-cpp/core/src/libzueci/zueci.c
 ```
+
+If the list of files becomes out of date, just `grep` all the `.cpp` and `.c` files from `./src/wasm/zxing-cpp/core/src`. Yes a makefile would be better.
+
+If you're on Windows, you can open up `cmd` and run `dir /A-D /S /B .\src\wasm\zxing-cpp\core\src\*.cpp .\src\wasm\zxing-cpp\core\src\*.c`.
+
+## FAQ
+
+Q) I only need to work with QR codes, no other type of barcode. Can the file be smaller?<br/>
+A) Not really. There's no corresponding version of [ZXing::ReadBarcodes](./zxing-cpp/core/src/MultiFormatReader.cpp) for a single format and one cannot be easily created. While `ZXing::ReadBarcodes` does the obvious job of barcode detection, it also handles the process of *converting a camera image into a scannable binary bitmap*, and does so using private implementation details.
+
+<hr>
+
+Q) I only need to scan xor generate barcodes. Can the file be smaller?<br/>
+A) While much more feasible than narrowing the barcode type, it is not currently planned at time of writing.
+
+<hr>
+
+Q) Why not use a Makefile?<br/>
+A) I lost it, somewhere at the intersection of laziness and sunk-cost fallacy. It all links the same anyways.
+
+<hr>

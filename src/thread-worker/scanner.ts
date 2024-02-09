@@ -3,6 +3,7 @@ import {
     getInstanceExports,
     getMemory
 } from "basic-event-wasi";
+import { ReadableBarcodeFormats, convertFormat } from "./barcode-formats.js";
 import { getWasmSync } from "./instance.js";
 import { ScanResult, ScanResultCoordinate } from "./shared.js";
 
@@ -17,7 +18,7 @@ function getCameraBuffer() {
 }
 
 
-function* scan(rgbaImageData: Uint8ClampedArray, width: number, height: number) {
+function* scan(rgbaImageData: Uint8ClampedArray, width: number, height: number, format: ReadableBarcodeFormats = "QRCode") {
     const { instance } = getWasmSync()!;
     const arrayInWasmForCameraImageData = getCameraBuffer();
 
@@ -26,8 +27,7 @@ function* scan(rgbaImageData: Uint8ClampedArray, width: number, height: number) 
 
     arrayInWasmForCameraImageData.resize(rgbaImageData.length);
     arrayInWasmForCameraImageData.set(rgbaImageData);
-    const qrFormat = getInstanceExports(instance).formatQRCode();
-    let resultCount = getInstanceExports(instance).scan(arrayInWasmForCameraImageData.address!, width, height, qrFormat, true);
+    let resultCount = getInstanceExports(instance).scan(arrayInWasmForCameraImageData.address!, width, height, convertFormat(format), true);
 
     for (let i = 0; i < resultCount; ++i) {
         const stringLength = getInstanceExports(instance).currentResultTextLength();
@@ -60,6 +60,6 @@ function* scan(rgbaImageData: Uint8ClampedArray, width: number, height: number) 
     }
 }
 
-export function scanAll(rgbaImageData: Uint8ClampedArray, width: number, height: number): ScanResult[] {
-    return [...scan(rgbaImageData, width, height)]
+export function scanAll(rgbaImageData: Uint8ClampedArray, width: number, height: number, format: ReadableBarcodeFormats = "QRCode"): ScanResult[] {
+    return [...scan(rgbaImageData, width, height, format)]
 }

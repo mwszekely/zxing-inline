@@ -1,8 +1,11 @@
 
+import { ReadableBarcodeFormats } from "../thread-worker/barcode-formats.js";
 import type { ScanResult } from "../thread-worker/shared.js";
 import { CameraStreamer, CameraStreamerConstructorOptions } from "./camera-streamer.js";
 import { scanAll, waitUntilReady } from "./thread-interop.js";
 
+export interface BarcodeScannerConstructorOptions extends CameraStreamerConstructorOptions {
+}
 
 /**
  * Create a `QrScanner` with a pre-existing <video> and <canvas> element
@@ -14,26 +17,21 @@ import { scanAll, waitUntilReady } from "./thread-interop.js";
  * 
  * This class is disposable, meaning you should either do `using scanner = new QrScanner();`, or whatever is framework-appropriate (e.g. for React `useEffect(() => { const scanner = new QrScanner(); return () => scanner[Symbol.dispose](); })`)
  */
-export class QrScanner implements Pick<CameraStreamer, "changeMedia" | "getLastCapture"> {
+export class BarcodeScanner implements Pick<CameraStreamer, "changeMedia" | "getLastCapture"> {
     private _streamer: CameraStreamer;
 
-    static async create(opts: CameraStreamerConstructorOptions = {}, initialConstraints: MediaStreamConstraints = { video: { facingMode: 'environment' }  }) {
-        const ret = new this(opts);
-        await ret.changeMedia(initialConstraints);
-        return ret;
-    }
-    protected constructor(opts: CameraStreamerConstructorOptions = {}) {
+    constructor(opts: Omit<BarcodeScannerConstructorOptions, "constraints"> = {}) {
         this._streamer = new CameraStreamer(opts);
     }
 
-    async changeMedia(constraints: MediaStreamConstraints = { video: { facingMode: 'environment' }  }) { return await this._streamer.changeMedia(constraints); }
+    async changeMedia(constraints: MediaStreamConstraints = { video: { facingMode: 'environment' } }) { return await this._streamer.changeMedia(constraints); }
     getLastCapture(): ImageData | null { return this._streamer.getLastCapture(); }
 
-    async scanOnce(): Promise<ScanResult[]> {
+    async scanOnce(format: ReadableBarcodeFormats = "QRCode"): Promise<ScanResult[]> {
         await this._streamer.waitForPageResume();
         await waitUntilReady();
         const data = await this._streamer.capture();
-        return await scanAll(data.data, data.width, data.height);
+        return await scanAll(data.data, data.width, data.height, format);
     }
 
     [Symbol.dispose]() {

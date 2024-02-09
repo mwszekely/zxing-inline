@@ -1,0 +1,4 @@
+export type ReadableBarcodeFormats = "Aztec" | "Codabar" | "Code128" | "Code39" | "Code93" | "DataBar" | "DataBarExpanded" | "DataMatrix" | "DXFilmEdge" | "EAN13" | "EAN8" | "ITF" | "LinearCodes" | "MatrixCodes" | "MaxiCode" | "MicroQRCode" | "None" | "PDF417" | "QRCode" | "RMQRCode" | "UPCA" | "UPCE";
+export type WritableBarcodeFormats = "Aztec" | "Codabar" | "Code128" | "Code39" | "Code93" | "DataMatrix" | "EAN13" | "EAN8" | "ITF" | "PDF417" | "QRCode" | "UPCA" | "UPCE";
+export declare function convertFormat(input: WritableBarcodeFormats | ReadableBarcodeFormats): number;
+//# sourceMappingURL=barcode-formats.d.ts.map

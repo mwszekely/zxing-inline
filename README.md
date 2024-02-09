@@ -1,83 +1,118 @@
 # QR Scanning/Generation from ZXing as a Single-File JS Import
 
-This is a no-frills single-file QR code scanner/generator using [the C++ port of ZXing](https://github.com/zxing-cpp/zxing-cpp).
-
-(It can also scan/create non-QR codes if requested as well &mdash; anything ZXing-C++ supports).
+This is a no-frills single-file barcode (including, namely, QR codes) scanner/generator using [the C++ port of ZXing](https://github.com/zxing-cpp/zxing-cpp).
 
 ## Features
 
 * Scanning an image runs in a separate `Worker` thread, so the main thread stays responsive.
 * ZXing is compiled to WASM from C++, so scanning is faster than with ports of ZXing to Javascript.
-* Both the `Worker` and the WASM binary are embedded directly into a single source file.
-* Supports at least iOS Safari 14, Firefox, and whatsitsname.
+* Both the `Worker` and the WASM binary are embedded directly into a single source file, so it can be easily integrated into any build system with no fuss.
+* Supports at least (iOS) Safari 14, Firefox, and whatsitsname.
 * Extremely simple API:
 
 ## API
 
-### Scanning QR Codes
+### Scanning QR Codes/barcodes
 
-Scanning a QR code is done by creating a `QrScanner`, then calling `scanOnce`.
+Scanning a QR code (or any other kind of barcode) is done by creating a `BarcodeScanner`, then calling `scanOnce`.
 
 **Important**: [The user must interact with the page](https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide#autoplay_availability) in some way before any of these `async` functions will return, as it's not possible (on some devices) to get a video feed of the camera before then.
 
 ```typescript
-import { QrScanner } from "scanner";
+import { BarcodeScanner } from "zxing-inline";
 
-// 1. Create the scanner (it also opens the device's camera and hooks up some events)
-using scanner = await QrScanner.create();
+// 1. Create the scanner 
+// (it also opens the device's camera and hooks up some events)
+using scanner = await BarcodeScanner.create({});
 
-// 2. Scan QR codes (can scan multiple in a single frame, so an array is returned)
-const [...results] = await scanner.scanOnce();
+// 2. Scan QR codes, the default
+// (multiple can be scanned in a single frame, so an array is returned)
+let [...results] = await scanner.scanOnce();
+
+// Or try scanning a different type of barcode
+results = await scanner.scanOnce("Aztec");
 ```
 
-If you want to track a QR code over time (to ensure you don't scan the same one every frame), and display that visually to the user, `QrAnimatingScanner` has an almost identical interface, but provides additional information and can draw to a canvas with a customizable render function.
+If you want to track a QR code over time (to ensure you don't scan the same one every frame), and display that visually to the user, `BarcodeAnimatingScanner` has an almost identical interface, but provides additional information and can draw to a canvas with a customizable render function.
 
 ```typescript
-import { QrAnimatingScanner } from "scanner"
+import { BarcodeAnimatingScanner } from "zxing-inline"
 
-// This is the canvas the QrAnimator will draw over.
-// It's separate from the scanner's canvas, 
-// which is just used for meta video-blitting purposes,
-// as this one's cleared every animation frame.
-// It should be overlaid over the video that draws the camera.
+// Get a canvas the QrAnimator will draw over.
 const c = document.getElementById('overlay-canvas');
+// ^^^^ It should be overlaid over the video that draws the camera
+// with, like, CSS and stuff. Grids make it pretty easy.
 
-using scanner = await QrAnimatingScanner.create({ canvas: c });
+// Create the scanner:
+using scanner = await BarcodeAnimatingScanner.create({ canvas: c });
+// ^^^^ It also initiates the camera and 
+// gets ready to start reading from it,
+// and will start drawing to the canvas when appropriate.
 
 while (true) {
+    // Actually attempt to scan a QR code in the device's camera view:
     const results = await scanner.scanOnce();
-    // ^^^^^^^^^^^^^^^^^^^^^^
-    // The canvas will be animated continuously,
-    // but timers will only run in relation to how
-    // long it takes for `scanOnce` to complete, 
-    // intended especially for slower devices.
+    // ^^^^ An array of results is returned, 
+    // as multiple QR codes in the same frame can be scanned.
     
     for (const result of results) {
-        if (result.freshness == 'new') {
-            // This is the first time this QR code has been seen
-            // (at least, for a specified timeout period)
-            // so this is where you'd put the code that acts 
-            // on its contents (so that work isn't duplicated)
-        }
+        // If execution's reached here, then this is the
+        // first frame we've seen this QR code.
+        //
+        // If we don't see it for a few seconds (configurable),
+        // but then see it again, it will re-appear here,
+        // e.g. assuming the user intentionally wanted to re-scan it
+        // but was simply unaware it was a duplicate.
+        //  
+        // Additionally, this corresponds exactly to what
+        // the user sees animated on the canvas, so that
+        // a new QR code looks different from an old QR code.
     }
 }
 ```
 
-## Generating QR Codes
+### Generating QR Codes
+
+`BarcodeEncoder` a basic wrapper around `ZXing`'s `MultiFormatWriter` class, and can encode any kind of supported barcode.
+
+`QrEncoder` is similar, but includes some QR specific features, like central cutouts and more intuitive error-correction values (actually just those two things).
+
+### Encode any kind of barcode
 
 ```typescript
-import { QrEncoder } from "scanner"
+import { BarcodeEncoder } from "zxing-inline"
 
-using encoder = new QrEncoder();
-const imageData = encoder.encode("String or ArrayBuffer", options);
+using encoder = new BarcodeEncoder();
+const imageBlob = await encoder.encode("String or ArrayBuffer", options);
+imageElement.src = URL.createObjectURL(imageBlob);
 
 // Where `options` contains any/none of:
 const options = {
-    errorCorrection, // 0 (minimal/no error correction) to 8 (maximum error correction)
-    cutoutImages     // An array of (SMALL) images to try overlaying in the center
+    errorCorrection, // A number between [0 - 8], where 8 is the most error correction.
+    format           // "QRCode" (default), "Aztec", etc. See `WritableBarcodeFormats`
 }
 
 ```
+
+### Encode QR codes specifically
+
+```typescript
+import { QrEncoder } from "zxing-inline"
+
+using encoder = new QrEncoder();
+const imageBlob = await encoder.encode("String or ArrayBuffer", options);
+imageElement.src = URL.createObjectURL(imageBlob);
+
+// Where `options` contains any/none of:
+const options = {
+    errorCorrection, // "1L", "2M", "3Q", or "4H"
+    cutoutImages     // An array of (TINY) images to try overlaying in the center
+}
+
+```
+
+`cutoutImages` works by overlaying the largest image in the center, and checking to see if it still scans. If it doesn't, the next smallest image is tried, all the way through your array. There are more sophisticated methods out there but they're a bit beyond the scope of a ZXing wrapper library (and even this is stretching it, honestly).
+
 
 
 ## Build Steps

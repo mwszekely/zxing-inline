@@ -19,4 +19,4 @@ export interface ScanResult {
     orientation: number;
 }
 export declare function waitUntilReady(): Promise<void>;
-//# sourceMappingURL=../../src/dist/thread-worker/shared.d.ts.map
+//# sourceMappingURL=shared.d.ts.map

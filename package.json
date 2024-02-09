@@ -1,33 +1,38 @@
 {
-  "name": "qr",
+  "name": "zxing-inline",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "browserslist": ">= 0.05%, defaults",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:separate": "npx rollup -c ./rollup-separate.config.mjs",
+    "build:separate": "npx rollup -c ./rollup-separate-main.config.mjs && npx rollup -c ./rollup-separate-worker.config.mjs",
     "build:combined": "npx rollup -c ./rollup-single.config.mjs",
-    "build:demo": "npx rollup -c ./demo/rollup.config.mjs",
+    "build:demo": "npx rollup -c ./rollup-demo.config.mjs",
     "build:types": "npx tsc",
-    "build": "npm run build:separate && npm run build:combined && npm run build:types"
+    "build": "npm run build:separate && npm run build:combined && npm run build:types && npm run build:demo"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "exports": {
-    ".": "./dist/index.js"
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js"
   },
   "dependencies": {
-    "@rollup/plugin-babel": "^6.0.4",
+    "@babel/preset-env": "^7.23.9",
+    "@babel/runtime": "^7.23.9",
+    "babel-preset-minify": "^0.5.2",
     "basic-event-wasi": "github:mwszekely/basic-event-wasi",
     "comlink": "^4.4.1",
-    "core-js": "^3.35.1",
-    "rollup": "^4.9.1",
-    "typescript": "5.4.0-dev.20240112"
+    "core-js": "^3.35.1"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.23.9",
     "@rollup/plugin-alias": "^5.1.0",
+    "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
@@ -35,7 +40,9 @@
     "@rollup/plugin-typescript": "^11.1.5",
     "@rollup/plugin-url": "^8.0.2",
     "@rollup/plugin-wasm": "^6.2.2",
+    "rollup": "^4.9.1",
     "rollup-plugin-chunk-workers": "github:mwszekely/rollup-plugin-chunk-workers",
-    "serve": "6"
+    "serve": "^6.5.8",
+    "typescript": "5.4.0-dev.20240207"
   }
 }

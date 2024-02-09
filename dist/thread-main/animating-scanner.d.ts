@@ -1,6 +1,6 @@
+import { ReadableBarcodeFormats } from "../thread-worker/barcode-formats.js";
 import type { ScanResult } from "../thread-worker/shared.js";
-import { CameraStreamerConstructorOptions } from "./camera-streamer.js";
-import { BarcodeScanner } from "./qr-scanner.js";
+import { BarcodeScanner, BarcodeScannerConstructorOptions } from "./scanner.js";
 export interface RenderInfo extends ScanResult {
     /**
      * Based on how long since we last saw this QR code, how faded should the graphic look? [0-1]
@@ -26,7 +26,13 @@ export interface RenderInfo extends ScanResult {
 type FadePhase = 'just-scanned' | 'just-drawn' | 'missing';
 type Freshness = 'new' | 'fading' | 'forgotten';
 export declare function defaultRender({ context, color: opacity2, opacity, positions, orientation }: RenderInfo): void;
-export type QrAnimatingScannerOptions = CameraStreamerConstructorOptions & {
+export interface AnimatedScanResult extends ScanResult {
+    firstScanned: number;
+    fadeStartTime: number | null;
+    fadePhase: FadePhase;
+    freshness: Freshness;
+}
+export interface BarcodeAnimatingScannerConstructorOptions extends BarcodeScannerConstructorOptions {
     /**
      * The canvas that will be drawn to. Should be overlaid over the
      * video that the camera is streaming to.
@@ -34,7 +40,7 @@ export type QrAnimatingScannerOptions = CameraStreamerConstructorOptions & {
     canvas: HTMLCanvasElement;
     /**
      * In milliseconds, how long it takes to "forget" a QR code
-     * and allow it to be scanned again.
+     * and allow it to be scanned again (default: 3000).
      *
      * This can be set to `Infinity`, but might be frustrating for
      * users in the uncommon case where this is desirable behavior.
@@ -44,12 +50,6 @@ export type QrAnimatingScannerOptions = CameraStreamerConstructorOptions & {
      * If provided, this function will be used to draw to the canvas instead of our own.
      */
     render?: (info: RenderInfo) => void;
-};
-export interface AnimatedScanResult extends ScanResult {
-    firstScanned: number;
-    fadeStartTime: number | null;
-    fadePhase: FadePhase;
-    freshness: Freshness;
 }
 /**
  * Derivation of QrScanner that tracks a single code over time so it can be drawn with an information overlay, or other operations.
@@ -63,13 +63,13 @@ export declare class BarcodeAnimatingScanner extends BarcodeScanner {
     private _canvasElement;
     private _rafHandle;
     private _currentScanResults;
-    protected constructor({ canvas, render, ...opts }: QrAnimatingScannerOptions);
+    constructor({ canvas, render, ...opts }: Omit<BarcodeAnimatingScannerConstructorOptions, "constraints">);
     /**
      * Scans the camera for QR codes, returning any found.
      *
      * If any are found, the canvas will animate to reflect the status of their scan.
      */
-    scanOnce(): Promise<AnimatedScanResult[]>;
+    scanOnce(format?: ReadableBarcodeFormats): Promise<AnimatedScanResult[]>;
     private onScan;
     private _rescanTimeout;
     get rescanTimeout(): number;
@@ -78,4 +78,4 @@ export declare class BarcodeAnimatingScanner extends BarcodeScanner {
     [Symbol.dispose](): void;
 }
 export {};
-//# sourceMappingURL=qr-animator.d.ts.map
+//# sourceMappingURL=animating-scanner.d.ts.map
