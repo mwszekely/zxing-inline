@@ -5,7 +5,7 @@ export {
 
 export type {
     AnimatedScanResult, BarcodeAnimatingScannerConstructorOptions,
-    BarcodeScannerConstructorOptions, EmptyInputError, RenderInfo
+    BarcodeScannerConstructorOptions, EmptyInputError, QrErrorCorrectionLevel, RenderInfo
 } from "./thread-main/index.js";
 
 export type {
