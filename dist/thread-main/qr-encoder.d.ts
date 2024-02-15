@@ -13,7 +13,7 @@ export interface QrEncodeOptions {
      *
      * By providing multiple, the largest will be tried until one works.
      */
-    cutoutImages?: ArrayOrT<Exclude<CanvasImageSource, HTMLOrSVGImageElement | VideoFrame>>;
+    cutoutImages?: ArrayOrT<HTMLImageElement | Exclude<CanvasImageSource, HTMLOrSVGImageElement | VideoFrame>>;
 }
 /**
  * Encodes data into a QR code.

@@ -27,7 +27,7 @@ export interface QrEncodeOptions {
      * 
      * By providing multiple, the largest will be tried until one works.
      */
-    cutoutImages?: ArrayOrT<Exclude<CanvasImageSource, HTMLOrSVGImageElement | VideoFrame>>;
+    cutoutImages?: ArrayOrT<HTMLImageElement | Exclude<CanvasImageSource, HTMLOrSVGImageElement | VideoFrame>>;
 }
 
 /**
@@ -35,7 +35,7 @@ export interface QrEncodeOptions {
  */
 export class QrEncoder extends BarcodeEncoderBase<CanvasRenderingContext2D> {
 
-    constructor({document}: BarcodeEncoderOptions = { document: window.document }) {
+    constructor({ document }: BarcodeEncoderOptions = { document: window.document }) {
         super({ document, id: "2d" })
     }
 

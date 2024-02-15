@@ -6,20 +6,21 @@ It may be useful to have multiple Workers instantiated from the same source, for
 
 ## To Build
 
-Run the following command (given in Powershell, replace the backticks as appropriate for more sensible shells). 
+Run the following command. 
 
-These assumptions are made:
+**These assumptions are made:**
 
 1. You're compiling from the project root, not here (i.e. `cd ../..` if necessary)
 1. Emscripten is on your PATH. If it's not, you can quickly do this by going to your `emsdk` directory, opening a new terminal, and running `emsdk_env`, then coming back to the root project directory and running this command.
 1. `emsdk`, with its `#include`-able header files, can be found in the parent folder (on second line, `-I"../emsdk/upstream/<...>`). Adjust if not.
+1. You're using Powershell (replace the backticks as appropriate for more sensible environments)
 
 ```powershell
 em++ `
 -I"../emsdk/upstream/emscripten/cache/sysroot/include" `
 -I"./src/wasm/zxing-cpp/core/src" `
 -I"./src/wasm/fnv" `
--O3 `
+-O3 -flto `
 -std=c++20 `
 -sALLOW_MEMORY_GROWTH `
 -sEXPORTED_FUNCTIONS="['_malloc', '_realloc', '_free']" `
