@@ -60,7 +60,7 @@ em++ `
 ./src/wasm/zxing-cpp/core/src/Utf.cpp `
 ./src/wasm/zxing-cpp/core/src/WhiteRectDetector.cpp `
 ./src/wasm/zxing-cpp/core/src/ZXBigInteger.cpp `
-./src/wasm/zxing-cpp/core/src/zxing-c.cpp `
+./src/wasm/zxing-cpp/core/src/ZXingC.cpp `
 ./src/wasm/zxing-cpp/core/src/aztec/AZDecoder.cpp `
 ./src/wasm/zxing-cpp/core/src/aztec/AZDetector.cpp `
 ./src/wasm/zxing-cpp/core/src/aztec/AZEncoder.cpp `
@@ -78,6 +78,7 @@ em++ `
 ./src/wasm/zxing-cpp/core/src/datamatrix/DMSymbolInfo.cpp `
 ./src/wasm/zxing-cpp/core/src/datamatrix/DMVersion.cpp `
 ./src/wasm/zxing-cpp/core/src/datamatrix/DMWriter.cpp `
+./src/wasm/zxing-cpp/core/src/libzueci/zueci.c `
 ./src/wasm/zxing-cpp/core/src/maxicode/MCBitMatrixParser.cpp `
 ./src/wasm/zxing-cpp/core/src/maxicode/MCDecoder.cpp `
 ./src/wasm/zxing-cpp/core/src/maxicode/MCReader.cpp `
@@ -131,8 +132,7 @@ em++ `
 ./src/wasm/zxing-cpp/core/src/qrcode/QRMatrixUtil.cpp `
 ./src/wasm/zxing-cpp/core/src/qrcode/QRReader.cpp `
 ./src/wasm/zxing-cpp/core/src/qrcode/QRVersion.cpp `
-./src/wasm/zxing-cpp/core/src/qrcode/QRWriter.cpp `
-./src/wasm/zxing-cpp/core/src/libzueci/zueci.c
+./src/wasm/zxing-cpp/core/src/qrcode/QRWriter.cpp
 ```
 
 If the list of files becomes out of date, just `grep` all the `.cpp` and `.c` files from `./src/wasm/zxing-cpp/core/src`. Yes a makefile would be better.
