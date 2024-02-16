@@ -426,7 +426,7 @@ class QrEncoder extends BarcodeEncoderBase {
         this._context.save();
         this._context.imageSmoothingEnabled = false;
         this._context.imageSmoothingQuality = 'low'; // TODO: Unnecessary?
-        this._context.drawImage(bmp, 0, 0, width, height, 0, 0, width, height);
+        this._context.drawImage(bmp, 0, 0, originalWidth, originalHeight, 0, 0, width, height);
         const sortedByArea = !cutoutImages ? [] : Array.isArray(cutoutImages) ? [...cutoutImages].sort((lhs, rhs) => { return (rhs.height * rhs.width) - (lhs.height * lhs.width); }) : [cutoutImages];
         let foundAnyCutout = false;
         const qrImageDataBeforeCutoutBg = await createImageBitmap(this._context.getImageData(0, 0, width, height, { colorSpace: 'srgb' }));
@@ -434,9 +434,9 @@ class QrEncoder extends BarcodeEncoderBase {
             for (let c of sortedByArea) {
                 this._context.clearRect(0, 0, width, height);
                 this._context.drawImage(qrImageDataBeforeCutoutBg, 0, 0);
-                const left = Math.floor((width / 2) - (c.width / 2));
-                const top = Math.floor((height / 2) - (c.height / 2));
-                this._context.drawImage(c, 0, 0, c.width, c.height, left, top, c.width, c.height);
+                const left = Math.floor((width / 2) - (c.width * sizeMultiplier / 2));
+                const top = Math.floor((height / 2) - (c.height * sizeMultiplier / 2));
+                this._context.drawImage(c, 0, 0, c.width, c.height, left, top, c.width * sizeMultiplier, c.height * sizeMultiplier);
                 const results = await scanAll(this._context.getImageData(0, 0, width, height).data, width, height);
                 if (results.length) {
                     foundAnyCutout = true;
