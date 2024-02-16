@@ -78,8 +78,8 @@ export class QrEncoder extends BarcodeEncoderBase<CanvasRenderingContext2D> {
             for (let c of sortedByArea) {
                 this._context.clearRect(0, 0, width, height);
                 this._context.drawImage(qrImageDataBeforeCutoutBg, 0, 0);
-                const left = Math.floor((width / 2) - (c.width * sizeMultiplier / 2));
-                const top = Math.floor((height / 2) - (c.height * sizeMultiplier / 2));
+                const left = Math.floor((originalWidth / 2) - (c.width / 2)) * sizeMultiplier;
+                const top = Math.floor((originalHeight / 2) - (c.height / 2)) * sizeMultiplier;
                 this._context.drawImage(c, 0, 0, c.width, c.height, left, top, c.width * sizeMultiplier, c.height * sizeMultiplier);
                 const results = await scanAll(this._context.getImageData(0, 0, width, height).data, width, height);
                 if (results.length) {
