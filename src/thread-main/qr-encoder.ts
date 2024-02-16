@@ -28,6 +28,13 @@ export interface QrEncodeOptions {
      * By providing multiple, the largest will be tried until one works.
      */
     cutoutImages?: ArrayOrT<HTMLImageElement | Exclude<CanvasImageSource, HTMLOrSVGImageElement | VideoFrame>>;
+
+    /**
+     * If provided, the image will be scaled by the given amount. Must be an integer greater than 0.
+     * 
+     * The use-case for this is to avoid image smoothing when copying and pasting, e.g. into Microsoft Word or similar.
+     */
+    sizeMultiplier?: number;
 }
 
 /**
@@ -43,13 +50,16 @@ export class QrEncoder extends BarcodeEncoderBase<CanvasRenderingContext2D> {
     async encode(inputData: Uint8Array, options?: QrEncodeOptions): Promise<Blob>;
     async encode(inputData: Uint8ClampedArray, options?: QrEncodeOptions): Promise<Blob>;
     async encode(inputData: string, options?: QrEncodeOptions): Promise<Blob>;
-    async encode(inputData: Int8Array | Uint8Array | Uint8ClampedArray | string, { errorCorrection, cutoutImages }: QrEncodeOptions = {}): Promise<Blob> {
+    async encode(inputData: Int8Array | Uint8Array | Uint8ClampedArray | string, { errorCorrection, cutoutImages, sizeMultiplier }: QrEncodeOptions = {}): Promise<Blob> {
         await waitUntilReady();
 
         errorCorrection ||= '2M';
+        sizeMultiplier ||= 1;
         const eccNumeric = (ECCMap[errorCorrection] || ECCMap["2M"]);
         const bmp = await this.encodeBasic(inputData, "QRCode", eccNumeric);
-        const { width, height } = bmp;
+        const { width: originalWidth, height: originalHeight } = bmp;
+        const width = originalWidth * sizeMultiplier;
+        const height = originalHeight * sizeMultiplier;
 
         this._canvas.width = width;
         this._canvas.height = height;

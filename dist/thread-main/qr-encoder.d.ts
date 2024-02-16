@@ -14,6 +14,12 @@ export interface QrEncodeOptions {
      * By providing multiple, the largest will be tried until one works.
      */
     cutoutImages?: ArrayOrT<HTMLImageElement | Exclude<CanvasImageSource, HTMLOrSVGImageElement | VideoFrame>>;
+    /**
+     * If provided, the image will be scaled by the given amount. Must be an integer greater than 0.
+     *
+     * The use-case for this is to avoid image smoothing when copying and pasting, e.g. into Microsoft Word or similar.
+     */
+    sizeMultiplier?: number;
 }
 /**
  * Encodes data into a QR code.

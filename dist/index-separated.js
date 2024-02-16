@@ -410,12 +410,15 @@ class QrEncoder extends BarcodeEncoderBase {
     constructor({ document } = { document: window.document }) {
         super({ document, id: "2d" });
     }
-    async encode(inputData, { errorCorrection, cutoutImages } = {}) {
+    async encode(inputData, { errorCorrection, cutoutImages, sizeMultiplier } = {}) {
         await waitUntilReady();
         errorCorrection ||= '2M';
+        sizeMultiplier ||= 1;
         const eccNumeric = (ECCMap[errorCorrection] || ECCMap["2M"]);
         const bmp = await this.encodeBasic(inputData, "QRCode", eccNumeric);
-        const { width, height } = bmp;
+        const { width: originalWidth, height: originalHeight } = bmp;
+        const width = originalWidth * sizeMultiplier;
+        const height = originalHeight * sizeMultiplier;
         this._canvas.width = width;
         this._canvas.height = height;
         this._context = this._canvas.getContext('2d', { willReadFrequently: true });
