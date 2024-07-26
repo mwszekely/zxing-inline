@@ -122,4 +122,38 @@ Run `pnpm run build` to transpile/bundle the Javascript/Typescript code. This is
 To build the WASM binary from the C++ source code, [see the readme in ./src/wasm](./src/wasm/README.md). Be aware that you'll need Emscripten installed and available on your PATH (i.e. you can open a fresh terminal, type `em++`, and it runs).
 
 ## Q: Dependencies?
-[ZXing-C++](https://github.com/zxing-cpp/zxing-cpp), of course. Also, to track QR codes over time we hash them using [FNV](http://www.isthe.com/chongo/tech/comp/fnv/index.html).
+
+### C++
+
+* [ZXing-C++](https://github.com/zxing-cpp/zxing-cpp), of course. 
+* [FNV](http://www.isthe.com/chongo/tech/comp/fnv/index.html), to generate hashes to track QR codes over time.
+
+### JS
+
+[Comlink](https://github.com/GoogleChromeLabs/comlink) is used by both the main and Worker threads. In the file exported by this library, Comlink is imported from `https://unpkg.com/comlink@4.4.1/dist/esm/comlink.mjs`.
+
+It isn't a bad idea to use [Import Maps](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap) to change this to a URL your site owns:
+
+````html
+<script type="importmap">
+  {
+    "imports": {
+      "https://unpkg.com/comlink@4.4.1/dist/esm/comlink.mjs": "https://mysite.com/comlink.mjs"
+    }
+  }
+</script>
+````
+
+### Build
+
+* Typescript
+* Rollup, and the appropriate plugins:
+  * Typescript
+  * Node Resolve
+  * URL (turn the `.wasm` file into an inlined data URI)
+  * Babel (used on the Worker code, as it's transformed into a string that won't be processed further by any build tool)
+  * Terser (same as Babel) 
+  * Chunk Workers (inlines Worker code)
+* core-js and some other Babel stuff for the same reasons as above
+* basic-event-wasi (glue code that's smaller than Emscripten's)
+

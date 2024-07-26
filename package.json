@@ -8,7 +8,9 @@
   "browserslist": ">= 0.05%, defaults",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:separate": "npx rollup -c ./rollup-separate-main.config.mjs && npx rollup -c ./rollup-separate-worker.config.mjs",
+    "build:separate:main": "npx rollup -c ./rollup-separate-main.config.mjs",
+    "build:separate:worker": "npx rollup -c ./rollup-separate-worker.config.mjs",
+    "build:separate": "npm run build:separate:main && npm run build:separate:worker",
     "build:combined": "npx rollup -c ./rollup-single.config.mjs",
     "build:demo": "npx rollup -c ./rollup-demo.config.mjs",
     "build:types": "npx tsc",
@@ -22,27 +24,22 @@
     "import": "./dist/index.js"
   },
   "dependencies": {
-    "@babel/preset-env": "^7.23.9",
-    "@babel/runtime": "^7.23.9",
-    "babel-preset-minify": "^0.5.2",
+    "@babel/preset-env": "^7.24.8",
+    "@babel/runtime": "^7.24.8",
     "basic-event-wasi": "github:mwszekely/basic-event-wasi",
     "comlink": "^4.4.1",
-    "core-js": "^3.35.1"
+    "core-js": "^3.37.1"
   },
   "devDependencies": {
-    "@babel/plugin-transform-runtime": "^7.23.9",
-    "@rollup/plugin-alias": "^5.1.0",
+    "@babel/plugin-transform-runtime": "^7.24.7",
     "@rollup/plugin-babel": "^6.0.4",
-    "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.1.5",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@rollup/plugin-url": "^8.0.2",
-    "@rollup/plugin-wasm": "^6.2.2",
-    "rollup": "^4.9.1",
+    "rollup": "^4.19.0",
     "rollup-plugin-chunk-workers": "github:mwszekely/rollup-plugin-chunk-workers",
     "serve": "^6.5.8",
-    "typescript": "5.4.0-dev.20240207"
+    "typescript": "5.5.4"
   }
 }

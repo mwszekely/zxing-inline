@@ -8,7 +8,7 @@
 import { __throw_exception_with_stack_trace, emscripten_notify_memory_growth, environ_get, environ_sizes_get, fd_close, fd_read, fd_seek, fd_write, instantiateStreamingWithWasi, instantiateWithWasi, proc_exit } from "basic-event-wasi";
 
 
-export const imports2 = {
+const imports2 = {
     env: { __throw_exception_with_stack_trace, emscripten_notify_memory_growth },
     wasi_snapshot_preview1: { fd_write, proc_exit, fd_close, fd_read, fd_seek, environ_get, environ_sizes_get }
 };
@@ -57,13 +57,17 @@ export {
     try {
         const obj = await sourceAsync;
         if (typeof obj == "string") {
-            resolveWasm(wasmSync = await instantiateStreamingWithWasi(fetch(new URL(obj, import.meta.url)), imports2))
+            const url = new URL(obj, import.meta.url);
+            resolveWasm(wasmSync = await instantiateStreamingWithWasi(fetch(url), imports2))
         }
         else if (obj instanceof Response) {
             resolveWasm(wasmSync = await instantiateStreamingWithWasi(obj, imports2))
         }
         else if (obj instanceof ArrayBuffer || obj instanceof WebAssembly.Module) {
             resolveWasm(wasmSync = await instantiateWithWasi(obj, imports2))
+        }
+        else {
+            throw new Error(`provideSource was called on the main thread with something that wasn't a string (as a URL), Response, ArrayBuffer, or WebAssembly.Module. Only those types can be instantiated.`);
         }
     }
     catch (e) {

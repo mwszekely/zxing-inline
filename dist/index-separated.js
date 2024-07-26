@@ -1,4 +1,4 @@
-import { wrap } from 'https://unpkg.com/comlink/dist/esm/comlink.mjs';
+import { wrap } from 'https://unpkg.com/comlink@4.4.1/dist/esm/comlink.mjs';
 
 //const anyUserInput = Promise.withResolvers<void>();
 //const auiHandler = () => { anyUserInput.resolve(); document.removeEventListener("click", auiHandler, { capture: true }) };

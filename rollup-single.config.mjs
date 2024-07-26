@@ -11,12 +11,9 @@ export default {
     output: {
         file: "dist/index.js",
         format: "es",
-        sourcemap: true,
-        paths: {
-            'comlink': "https://unpkg.com/comlink/dist/esm/comlink.mjs"
-        }
+        sourcemap: true
     },
-    external: ['https://unpkg.com/comlink/dist/esm/comlink.mjs'],
+    external: ['https://unpkg.com/comlink@4.4.1/dist/esm/comlink.mjs'],
     treeshake: "recommended",
     plugins: [
         chunkWorkers({ mode: "inline" }),

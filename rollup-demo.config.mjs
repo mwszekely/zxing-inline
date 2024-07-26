@@ -1,6 +1,5 @@
 
 import { babel } from "@rollup/plugin-babel";
-import cjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 
 /** @type {import('rollup').RollupOptions} */
@@ -11,14 +10,13 @@ export default {
         format: "es",
         sourcemap: true,
         paths: {
-            'comlink': "https://unpkg.com/comlink/dist/esm/comlink.mjs"
+            'comlink': "https://unpkg.com/comlink@4.4.1/dist/esm/comlink.mjs"
         }
     },
-    external: ['https://unpkg.com/comlink/dist/esm/comlink.mjs'],
+    external: ['comlink', 'https://unpkg.com/comlink@4.4.1/dist/esm/comlink.mjs'],
     treeshake: "recommended",
     plugins: [
         babel({ babelHelpers: 'bundled' }),
-        resolve(),
-        cjs()
+        resolve()
     ]
 }
